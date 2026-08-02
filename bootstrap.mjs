@@ -27,4 +27,4 @@ if (result.status !== 0) {
   throw new Error("Power NOW source extraction failed.");
 }
 
-console.log("Materialized Power NOW storefront source (005b4f0de2f5).");
+console.log("Materialized Power NOW storefront source (2d813cbca6e4).");
