@@ -11,7 +11,7 @@ export default async function HomePage() {
   const settings = await loadStorefrontSettings();
 
   return (
-    <main>
+    <main className="storefront-page">
       <header
         className="site-header"
         aria-label="Power NOW site navigation"
@@ -50,14 +50,7 @@ export default async function HomePage() {
         </details>
       </header>
 
-      <section
-        className="hero-section"
-        style={
-          {
-            "--hero-image": `url(${settings.imagery.heroBackgroundUrl})`
-          } as React.CSSProperties
-        }
-      >
+      <section className="hero-section">
         <div className="hero-content">
           <p className="eyebrow">
             {settings.product.editionLabel}
@@ -97,97 +90,34 @@ export default async function HomePage() {
           aria-label="Published book cover"
         >
           <BookCover settings={settings} priority />
-          <a
-            className="amazon-reference"
-            href={settings.product.amazonUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            View the published edition on Amazon
-          </a>
         </aside>
       </section>
 
-      <section className="section spacious-section intro-section">
+      <section className="section intro-section">
         <div className="section-kicker">
           <p className="eyebrow">The premise</p>
           <h2>
-            Success gets faster when the right action gets
-            clearer.
+            Success gets faster when the right action gets clearer.
           </h2>
         </div>
         <div className="text-column">
           <p>
             {settings.brand.promise} It is not a shame-based book
-            about procrastination. It is about harvest: doing the
-            things now that create growth and putting down the
-            distractions that siphon away productive energy.
+            about procrastination. It is about harvesting the work
+            already within reach and putting down the distractions
+            that siphon away productive energy.
           </p>
           <p>
-            The first move is clarity. When the win is defined,
-            the work that moves the needle separates itself from
-            the noise, and today can stop feeling like a fog of
-            equal priorities.
-          </p>
-        </div>
-      </section>
-
-      {settings.proof.testimonials.length ? (
-        <section
-          className="testimonial-strip"
-          aria-label="Reader testimonials"
-        >
-          {settings.proof.testimonials
-            .slice(0, 4)
-            .map((testimonial) => (
-              <figure
-                key={`${testimonial.quote}-${testimonial.attribution}`}
-              >
-                <blockquote>
-                  “{testimonial.quote}”
-                </blockquote>
-                <figcaption>
-                  {testimonial.attribution}
-                  {testimonial.role ? (
-                    <span>{testimonial.role}</span>
-                  ) : null}
-                </figcaption>
-              </figure>
-            ))}
-        </section>
-      ) : null}
-
-      <section className="section image-text-section">
-        <div className="image-panel">
-          <img
-            src={settings.imagery.writingDeskUrl}
-            alt="A focused writing desk with notebook and planning materials"
-            width="1800"
-            height="1200"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-        <div>
-          <p className="eyebrow">Read the book when…</p>
-          <h2>You have more ideas than finished moves.</h2>
-          <p>
-            The book is built for business owners, analysts,
-            creators, leaders, and builders who already know they
-            need to act—but need a cleaner way to choose the next
-            move and make it now.
+            The book is for business owners, analysts, creators,
+            leaders, and builders who have more ideas than finished
+            moves—and need a cleaner way to choose what deserves
+            their now.
           </p>
           <ul className="minimal-list">
             <li>Define the win so action has a target.</li>
-            <li>
-              Separate needle-moving work from polished busywork.
-            </li>
-            <li>
-              Choose the Big Three for business and life.
-            </li>
-            <li>
-              Protect execution capacity so speed is sustainable.
-            </li>
+            <li>Separate needle-moving work from busywork.</li>
+            <li>Choose the Big Three for business and life.</li>
+            <li>Protect execution capacity so speed can last.</li>
           </ul>
         </div>
       </section>
@@ -218,9 +148,7 @@ export default async function HomePage() {
       <section className="section parts-section">
         <div className="section-heading">
           <p className="eyebrow">Inside the book</p>
-          <h2>
-            Five movements from clarity to multiplied wins.
-          </h2>
+          <h2>Five movements from clarity to multiplied wins.</h2>
         </div>
 
         <div className="parts-list">
@@ -243,37 +171,12 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="section image-text-section reverse-section">
-        <div>
-          <p className="eyebrow">From the author</p>
-          <h2>
-            Turn clarity into a move you can make today.
-          </h2>
-          <p>{settings.copy.directEditionIntro}</p>
-          <p>
-            Purchase without creating an account. Stripe presents
-            the book price, shipping and handling, and applicable
-            sales tax as separate amounts before payment.
-          </p>
-        </div>
-        <div className="image-panel">
-          <img
-            src={settings.imagery.actionWorkspaceUrl}
-            alt="People gathered around a table moving work from planning into action"
-            width="1800"
-            height="1200"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-      </section>
-
       <section className="buy-section" id="buy">
         <div className="buy-copy">
           <p className="eyebrow">Buy direct</p>
           <h2>{settings.product.title}</h2>
           <p>{settings.product.subtitle}</p>
-          <PriceBreakdown settings={settings} dark />
+          <PriceBreakdown settings={settings} />
           <p className="muted">
             {settings.product.estimatedShipWindow}
           </p>
@@ -295,22 +198,15 @@ export default async function HomePage() {
       </section>
 
       {settings.affiliate.enabled ? (
-        <section
-          className="affiliate-band"
-          style={{
-            backgroundImage: `linear-gradient(90deg, color-mix(in srgb, var(--theme-primary) 94%, transparent), color-mix(in srgb, var(--theme-primary) 68%, transparent)), url(${settings.imagery.affiliateUrl})`
-          }}
-        >
+        <section className="affiliate-band">
           <div>
             <p className="eyebrow">Share the framework</p>
-            <h2>
-              Help your audience put better work in motion.
-            </h2>
+            <h2>Help your audience put better work in motion.</h2>
             <p>{settings.affiliate.intro}</p>
           </div>
           <Link
             href="/affiliates"
-            className="button button-on-dark"
+            className="button button-secondary"
           >
             View affiliate details
           </Link>
@@ -323,9 +219,7 @@ export default async function HomePage() {
           <span>{settings.brand.tagline}</span>
         </div>
         <nav aria-label="Footer navigation">
-          <Link href="/read-chapter-one">
-            Read a sample
-          </Link>
+          <Link href="/read-chapter-one">Read a sample</Link>
           {settings.affiliate.enabled ? (
             <Link href="/affiliates">Affiliates</Link>
           ) : null}
