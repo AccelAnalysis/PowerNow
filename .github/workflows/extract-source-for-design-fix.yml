@@ -1,0 +1,54 @@
+name: Extract source for design fix
+
+on:
+  push:
+    branches:
+      - fix/design-simplification
+    paths:
+      - .github/workflows/extract-source-for-design-fix.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/design-simplification
+          fetch-depth: 0
+
+      - name: Materialize bundled application
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .powernow/part* | base64 --decode > /tmp/powernow.tar.xz
+          tar -xJf /tmp/powernow.tar.xz -C .
+
+      - name: Capture editable source
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf inspection
+          mkdir -p inspection
+          for dir in app components lib scripts public; do
+            if [ -d "$dir" ]; then
+              find "$dir" -type f \( -name '*.tsx' -o -name '*.ts' -o -name '*.css' -o -name '*.mjs' \) -print0 | while IFS= read -r -d '' file; do
+                mkdir -p "inspection/$(dirname "$file")"
+                cp "$file" "inspection/$file"
+              done
+            fi
+          done
+          find . -maxdepth 3 -type f | sort > inspection/file-manifest.txt
+
+      - name: Commit inspection source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add inspection
+          git commit -m "Expose storefront source for design correction"
+          git push origin HEAD:fix/design-simplification
