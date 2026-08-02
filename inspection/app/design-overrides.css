@@ -1,0 +1,310 @@
+/*
+ * Storefront simplification pass.
+ *
+ * The public page uses one stable, restrained palette at first paint.
+ * Color no longer changes after hydration, and the storefront is organized
+ * as full-width editorial bands instead of a stack of rounded containers.
+ */
+
+:root {
+  --theme-primary: #171717;
+  --theme-secondary: #57534e;
+  --theme-accent: #8a6418;
+  --theme-paper: #ffffff;
+  --theme-on-primary: #ffffff;
+  --ink: #171717;
+  --ink-soft: #525252;
+  --muted: #737373;
+  --paper: #ffffff;
+  --paper-deep: #f7f7f5;
+  --line: rgba(23, 23, 23, 0.13);
+  --line-strong: rgba(23, 23, 23, 0.24);
+  --shadow: 0 26px 70px rgba(0, 0, 0, 0.16);
+}
+
+html,
+body,
+.storefront-page {
+  background: #ffffff;
+}
+
+.storefront-page {
+  width: 100%;
+  overflow: clip;
+}
+
+.storefront-page .site-header {
+  width: 100%;
+  min-height: 72px;
+  padding-inline: clamp(20px, 4.5vw, 76px);
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(16px);
+}
+
+.storefront-page .brand-lockup small {
+  color: var(--theme-accent);
+}
+
+.storefront-page .hero-section {
+  width: 100%;
+  min-height: calc(100svh - 72px);
+  grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.72fr);
+  gap: clamp(44px, 7vw, 112px);
+  padding: clamp(64px, 8vw, 124px) clamp(20px, 6vw, 104px);
+  background: #ffffff;
+}
+
+.storefront-page .hero-section::before,
+.storefront-page .hero-section::after {
+  content: none;
+}
+
+.storefront-page .hero-content {
+  max-width: 850px;
+}
+
+.storefront-page .hero-content h1 {
+  max-width: 830px;
+  font-size: clamp(3.25rem, 6.6vw, 7.4rem);
+}
+
+.storefront-page .hero-subhead {
+  max-width: 680px;
+}
+
+.storefront-page .hero-book {
+  gap: 0;
+}
+
+.storefront-page .book-object {
+  width: min(360px, 76vw);
+  transform: none;
+  filter: drop-shadow(0 28px 36px rgba(0, 0, 0, 0.18));
+}
+
+.storefront-page .book-face {
+  border-radius: 4px 10px 10px 4px;
+  transform: rotateY(-7deg);
+}
+
+.storefront-page .proof-row {
+  gap: 0;
+  margin-top: 30px;
+  color: var(--muted);
+}
+
+.storefront-page .proof-row span {
+  min-height: auto;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: 0.8rem;
+  font-weight: 720;
+}
+
+.storefront-page .proof-row span:not(:last-child)::after {
+  content: "·";
+  margin: 0 11px;
+  color: var(--theme-accent);
+}
+
+.storefront-page .section,
+.storefront-page .buy-section,
+.storefront-page .affiliate-band,
+.storefront-page .site-footer {
+  width: 100%;
+  margin: 0;
+  border-radius: 0;
+}
+
+.storefront-page .section {
+  padding: clamp(78px, 9vw, 138px) clamp(20px, 6vw, 104px);
+}
+
+.storefront-page .intro-section {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(42px, 8vw, 124px);
+  align-items: start;
+  background: #ffffff;
+  border-top: 1px solid var(--line);
+}
+
+.storefront-page .minimal-list {
+  margin-top: 34px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.storefront-page .framework-section {
+  background: var(--theme-primary);
+}
+
+.storefront-page .framework-section .section-heading {
+  max-width: 900px;
+}
+
+.storefront-page .cycle-grid {
+  gap: 0;
+  margin-top: clamp(48px, 7vw, 82px);
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.storefront-page .cycle-grid article {
+  min-height: 270px;
+  padding: clamp(30px, 4vw, 52px);
+  border-top: 0;
+}
+
+.storefront-page .cycle-grid article + article {
+  border-left: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.storefront-page .cycle-grid h3 {
+  margin-top: 54px;
+}
+
+.storefront-page .parts-section {
+  background: #ffffff;
+}
+
+.storefront-page .parts-list {
+  gap: 0;
+  margin-top: 52px;
+  background: transparent;
+  border-bottom: 1px solid var(--line);
+}
+
+.storefront-page .parts-list article {
+  padding: clamp(34px, 5vw, 64px) 0;
+  background: transparent;
+  border-top: 1px solid var(--line);
+}
+
+.storefront-page .buy-section {
+  grid-template-columns: minmax(0, 1fr) minmax(330px, 0.78fr);
+  padding: clamp(86px, 10vw, 150px) clamp(20px, 6vw, 104px);
+  color: var(--ink);
+  background: #f7f7f5;
+  border-top: 1px solid var(--line);
+}
+
+.storefront-page .buy-section p,
+.storefront-page .buy-section .muted,
+.storefront-page .buy-card small {
+  color: var(--ink-soft);
+}
+
+.storefront-page .buy-card {
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.storefront-page .buy-card .quantity-control {
+  color: var(--ink-soft);
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+
+.storefront-page .buy-card .checkout-note {
+  color: var(--muted);
+}
+
+.storefront-page .buy-card .button-primary {
+  color: #ffffff;
+  background: var(--theme-primary);
+}
+
+.storefront-page .affiliate-band {
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: clamp(56px, 7vw, 90px) clamp(20px, 6vw, 104px);
+  color: var(--ink);
+  background: #ffffff;
+  border-top: 1px solid var(--line);
+}
+
+.storefront-page .affiliate-band .eyebrow {
+  color: var(--theme-accent);
+}
+
+.storefront-page .affiliate-band p {
+  color: var(--ink-soft);
+}
+
+.storefront-page .site-footer {
+  padding: 42px clamp(20px, 6vw, 104px) 112px;
+  background: #ffffff;
+  border-top: 1px solid var(--line);
+}
+
+.storefront-page .site-footer nav a:last-child {
+  color: var(--muted);
+  font-weight: 650;
+}
+
+@media (max-width: 960px) {
+  .storefront-page .hero-section,
+  .storefront-page .intro-section,
+  .storefront-page .buy-section {
+    grid-template-columns: 1fr;
+  }
+
+  .storefront-page .hero-section {
+    min-height: auto;
+    padding-top: clamp(56px, 10vw, 88px);
+  }
+
+  .storefront-page .hero-book {
+    padding-top: 12px;
+  }
+
+  .storefront-page .cycle-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .storefront-page .cycle-grid article + article {
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.22);
+  }
+
+  .storefront-page .affiliate-band {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .storefront-page .site-header {
+    padding-inline: 18px;
+  }
+
+  .storefront-page .hero-section,
+  .storefront-page .section,
+  .storefront-page .buy-section,
+  .storefront-page .affiliate-band,
+  .storefront-page .site-footer {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .storefront-page .proof-row {
+    display: grid;
+    gap: 7px;
+  }
+
+  .storefront-page .proof-row span:not(:last-child)::after {
+    content: none;
+  }
+
+  .storefront-page .parts-list article {
+    grid-template-columns: 1fr;
+  }
+
+  .storefront-page .site-footer {
+    align-items: flex-start;
+  }
+}
