@@ -1,26 +1,30 @@
-import { appendFileSync, copyFileSync, readFileSync, writeFileSync } from "node:fs";
-import { execFileSync } from "node:child_process";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import path from "node:path";
 
-const parts = Array.from({ length: 9 }, (_, index) =>
-  `.powernow-bootstrap/part${String(index).padStart(2, "0")}`
-);
+const sourceDirectory = path.join(process.cwd(), ".powernow");
+const partNames = readdirSync(sourceDirectory)
+  .filter((name) => /^part\d+$/.test(name))
+  .sort();
 
-const encodedArchive = parts.map((path) => readFileSync(path, "utf8")).join("");
-const archivePath = "/tmp/powernow-source.tar.xz";
-
-writeFileSync(archivePath, Buffer.from(encodedArchive, "base64"));
-execFileSync("tar", ["-xJf", archivePath, "-C", process.cwd()], { stdio: "inherit" });
-
-copyFileSync("patches/checkout-route.ts", "app/api/checkout/route.ts");
-copyFileSync("patches/mobile-buy-bar.tsx", "components/MobileBuyBar.tsx");
-
-const refinementMarker = "/* Final mobile conversion refinements */";
-const refinements = readFileSync("patches/mobile-refinements.css", "utf8");
-const globalsPath = "app/globals.css";
-const globals = readFileSync(globalsPath, "utf8");
-
-if (!globals.includes(refinementMarker)) {
-  appendFileSync(globalsPath, `\n${refinements}\n`);
+if (!partNames.length) {
+  throw new Error("Power NOW source bundle is missing.");
 }
 
-console.log("Rehydrated the reviewed Power NOW storefront source and applied production refinements.");
+const encoded = partNames
+  .map((name) => readFileSync(path.join(sourceDirectory, name), "utf8"))
+  .join("");
+const archivePath = path.join("/tmp", "powernow-source.tar.xz");
+writeFileSync(archivePath, Buffer.from(encoded, "base64"));
+
+const result = spawnSync(
+  "tar",
+  ["-xJf", archivePath, "-C", process.cwd()],
+  { stdio: "inherit" }
+);
+
+if (result.status !== 0) {
+  throw new Error("Power NOW source extraction failed.");
+}
+
+console.log("Materialized Power NOW storefront source (005b4f0de2f5).");

@@ -1,7 +1,9 @@
 .next/
-out/
 node_modules/
-.env*.local
+out/
+.env
+.env.local
+.env.*.local
 .DS_Store
 *.log
-data/orders.ndjson
+coverage/
