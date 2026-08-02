@@ -1,0 +1,118 @@
+{
+  "brand": {
+    "seriesName": "Power NOW",
+    "bookTitle": "Clarity Creates Speed",
+    "authorName": "Jonathan R. Holman",
+    "publisherName": "Accel Analysis",
+    "tagline": "Quicker, better action. Quicker, better success.",
+    "promise": "A practical field guide for closing the gap between insight and action.",
+    "accentHex": "#C68A2D"
+  },
+  "seo": {
+    "title": "Clarity Creates Speed | Power NOW by Jonathan R. Holman",
+    "description": "Buy Clarity Creates Speed direct from the author. A practical Power NOW field guide for quicker, better action and quicker, better success.",
+    "canonicalUrl": "https://powernow.example.com"
+  },
+  "product": {
+    "id": "clarity-creates-speed-paperback",
+    "title": "Clarity Creates Speed",
+    "subtitle": "Put your now on the work that actually deserves it.",
+    "editionLabel": "Paperback · Direct Author Edition",
+    "priceCents": 2000,
+    "shippingCents": 495,
+    "currency": "usd",
+    "purchaseLimit": 10,
+    "shipsFrom": "Accel Analysis",
+    "estimatedShipWindow": "Ships in 3–5 business days",
+    "amazonUrl": "https://www.amazon.com/Clarity-Creates-Speed-actually-deserves/dp/B0H3PJ8GT8/",
+    "asin": "B0H3PJ8GT8"
+  },
+  "copy": {
+    "heroHook": "Know what deserves your now—and move before the moment cools.",
+    "heroSubhead": "Clarity Creates Speed is the first Power NOW book: a concise, practical guide for turning vague intention into focused action, cleaner decisions, and meaningful momentum.",
+    "primaryCta": "Buy direct",
+    "secondaryCta": "Read Chapter One",
+    "directEditionIntro": "Buying direct keeps the path simple: one book, one clear price, secure Stripe checkout, and no account required.",
+    "frameworkIntro": "The Power NOW framework turns success into a repeatable operating loop: Start quicker, Sustain better, Succeed more often, then multiply what works.",
+    "chapterOneIntro": "Chapter One begins where real speed begins: defining the win clearly enough that your next action becomes obvious."
+  },
+  "imagery": {
+    "heroBackgroundUrl": "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=2400&q=82",
+    "bookCoverUrl": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1200&q=82",
+    "bookTextureUrl": "https://images.unsplash.com/photo-1519682337058-a94d519337bc?auto=format&fit=crop&w=1200&q=82",
+    "writingDeskUrl": "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1800&q=82",
+    "actionWorkspaceUrl": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1800&q=82",
+    "affiliateUrl": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1800&q=82"
+  },
+  "proof": {
+    "assuranceItems": [
+      "Secure Stripe checkout",
+      "Apple Pay and Google Pay available when enabled in Stripe",
+      "No customer account required",
+      "$20 book + $4.95 shipping & handling"
+    ],
+    "testimonials": []
+  },
+  "framework": {
+    "steps": [
+      {
+        "label": "Start",
+        "description": "Take a concrete step now instead of letting the idea cool on the shelf."
+      },
+      {
+        "label": "Sustain",
+        "description": "Build the rhythms and feedback loops that keep the right work moving."
+      },
+      {
+        "label": "Succeed",
+        "description": "Let repeated, meaningful action compound into results, opportunities, and freedom."
+      }
+    ],
+    "parts": [
+      {
+        "eyebrow": "Part I",
+        "title": "Clarity Creates Speed",
+        "question": "What should I be doing now instead of everything else?",
+        "chapters": ["Define the Win", "Work That Moves the Needle", "The NOW Success Cycle", "The Big Three for Today"]
+      },
+      {
+        "eyebrow": "Part II",
+        "title": "Start Quicker",
+        "question": "How do I get myself to start the right things today instead of later?",
+        "chapters": ["Why We Don’t Start", "Micro-Starts That Break the Stall", "Productive Pressure", "From Idea to In-Motion"]
+      },
+      {
+        "eyebrow": "Part III",
+        "title": "Sustain Better",
+        "question": "How do I keep going long enough for success to become inevitable?",
+        "chapters": ["From Effort to Rhythm", "Environment by Design", "Feedback in Motion", "Stay, Shift, or Stop"]
+      },
+      {
+        "eyebrow": "Part IV",
+        "title": "Guarding Your Execution Capacity",
+        "question": "How do I protect my ability to act quickly and well over the long haul?",
+        "chapters": ["Find the Leaks", "The Power of No", "Calendar as Strategy", "Recovery as Fuel"]
+      },
+      {
+        "eyebrow": "Part V",
+        "title": "Multiply Your Wins",
+        "question": "How do I make each success create more—and faster—success?",
+        "chapters": ["Repeat the Win", "Document to Scale", "Leverage Engines", "Living in the Loop"]
+      }
+    ]
+  },
+  "checkout": {
+    "buyButtonLabel": "Buy direct — $20",
+    "allowedCountries": ["US"],
+    "collectPhone": false,
+    "allowPromotionCodes": true
+  },
+  "affiliate": {
+    "enabled": true,
+    "defaultCommissionPercent": 20,
+    "cookieDays": 30,
+    "applyEmail": "hello@accelanalysis.com",
+    "intro": "The affiliate layer is built for reviewers, podcasters, ministry leaders, coaches, and business communities that want to share the Power NOW framework without turning the site into a hard-sell funnel.",
+    "assetLinks": []
+  }
+}
