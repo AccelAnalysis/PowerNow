@@ -1,0 +1,44 @@
+name: Package production deploy
+
+on:
+  push:
+    branches:
+      - ops/production-deploy-artifact
+    paths:
+      - .github/workflows/package-production-deploy.yml
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify bundled release
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install
+          npm run check:pricing
+          npm run typecheck
+          npm run build
+
+      - name: Assemble deploy input
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p deploy-input/.powernow deploy-input/data
+          cp package.json bootstrap.mjs vercel.json deploy-input/
+          cp .powernow/part* deploy-input/.powernow/
+          cp data/site-settings.json deploy-input/data/
+          cd deploy-input
+          zip -r ../power-now-production.zip .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: power-now-production
+          path: power-now-production.zip
+          if-no-files-found: error
+          retention-days: 1
