@@ -14,11 +14,11 @@
     "canonicalUrl": "https://power-now.vercel.app/"
   },
   "theme": {
-    "useCoverPalette": true,
+    "useCoverPalette": false,
     "fallbackPrimary": "#171717",
-    "fallbackSecondary": "#4A4A4A",
-    "fallbackAccent": "#767676",
-    "fallbackPaper": "#F5F4F1"
+    "fallbackSecondary": "#57534E",
+    "fallbackAccent": "#8A6418",
+    "fallbackPaper": "#FFFFFF"
   },
   "product": {
     "id": "clarity-creates-speed-paperback",
@@ -56,10 +56,8 @@
   "proof": {
     "assuranceItems": [
       "Secure Stripe checkout",
-      "No customer account required",
-      "$20.00 per book",
-      "$4.95 shipping & handling per order",
-      "Applicable tax calculated separately"
+      "$20.00 per book + $4.95 shipping per order",
+      "Applicable tax itemized at checkout"
     ],
     "testimonials": []
   },

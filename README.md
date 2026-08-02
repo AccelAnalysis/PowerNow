@@ -60,7 +60,7 @@ The production source bundle is stored in the split `.powernow/part*` bundle and
 Archive SHA-256:
 
 ```text
-005b4f0de2f59932a8104178a80ae71c1d4249109cabdcfaf251ad337444934a
+2d813cbca6e4c8189303e7f81bffb063b948ef09db1c98bcb0fa90ced64aa069
 ```
 
 `data/site-settings.json` remains outside the archive so the GitHub-backed admin can update it without rebuilding the application source.
