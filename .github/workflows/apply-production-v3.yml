@@ -1,0 +1,44 @@
+name: Apply Power NOW production source v3
+
+on:
+  push:
+    branches:
+      - build/direct-sales-site
+    paths:
+      - .github/workflows/apply-production-v3.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out release branch
+        uses: actions/checkout@v4
+        with:
+          ref: build/direct-sales-site
+          fetch-depth: 0
+
+      - name: Rebuild verified clean source
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .production-source-v3/part* > /tmp/powernow-source.b64
+          cat .production-source-v3/hex* > /tmp/powernow-tail.hex
+          python3 -c "from pathlib import Path; p=Path('/tmp/powernow-source.b64'); p.write_bytes(p.read_bytes()+bytes.fromhex(Path('/tmp/powernow-tail.hex').read_text()))"
+          base64 --decode /tmp/powernow-source.b64 > /tmp/powernow-source.tar.xz
+          echo "718c89b6d6627f57ef66bb94d3fbf1cd2a13b90b404f838d074760e0e3bb123d  /tmp/powernow-source.tar.xz" | sha256sum -c -
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          tar -xJf /tmp/powernow-source.tar.xz -C .
+
+      - name: Commit clean production source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Apply production pricing, cover, admin, and fulfillment automation"
+          git push origin HEAD:build/direct-sales-site
