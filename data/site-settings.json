@@ -1,0 +1,155 @@
+{
+  "brand": {
+    "seriesName": "Power NOW",
+    "bookTitle": "Clarity Creates Speed",
+    "authorName": "Jonathan R. Holman",
+    "publisherName": "Accel Analysis",
+    "contactEmail": "hello@accelanalysis.com",
+    "tagline": "Quicker, better action. Quicker, better success.",
+    "promise": "A practical field guide for closing the gap between insight and action."
+  },
+  "seo": {
+    "title": "Clarity Creates Speed | Power NOW by Jonathan R. Holman",
+    "description": "Buy Clarity Creates Speed direct from the author. Define the win, identify the work that moves it, and act with greater speed.",
+    "canonicalUrl": "https://power-now.vercel.app/"
+  },
+  "theme": {
+    "useCoverPalette": true,
+    "fallbackPrimary": "#171717",
+    "fallbackSecondary": "#4A4A4A",
+    "fallbackAccent": "#767676",
+    "fallbackPaper": "#F5F4F1"
+  },
+  "product": {
+    "id": "clarity-creates-speed-paperback",
+    "stripeProductId": "prod_UzoKNuyI2AYWzx",
+    "stripePriceId": "price_1TzomYAhUpL6HYCQbfVTOL3j",
+    "title": "Clarity Creates Speed",
+    "subtitle": "Know what actually deserves your NOW.",
+    "editionLabel": "Paperback · Direct from the Author",
+    "priceCents": 2000,
+    "shippingCents": 495,
+    "currency": "usd",
+    "purchaseLimit": 10,
+    "shipsFrom": "Accel Analysis",
+    "estimatedShipWindow": "Estimated delivery: 5–10 business days after payment confirmation",
+    "amazonUrl": "https://www.amazon.com/Clarity-Creates-Speed-actually-deserves/dp/B0H3PJ8GT8/",
+    "asin": "B0H3PJ8GT8",
+    "taxNotice": "Plus applicable sales tax, calculated at checkout."
+  },
+  "copy": {
+    "heroHook": "Know what deserves your now—and move before the moment cools.",
+    "heroSubhead": "The first Power NOW book gives business owners, leaders, and builders a practical way to define the win, identify the work that moves it, and act with greater speed.",
+    "primaryCta": "Buy direct",
+    "secondaryCta": "Read a sample",
+    "directEditionIntro": "Order the first book in the Power NOW series directly from the author through a secure, account-free checkout.",
+    "frameworkIntro": "The Power NOW framework turns success into a repeatable operating loop: Start quicker, Sustain better, Succeed more often, then multiply what works.",
+    "chapterOneIntro": "Chapter One begins where real speed begins: defining the win clearly enough that your next action becomes obvious."
+  },
+  "imagery": {
+    "bookCoverUrl": "https://images.amazon.com/images/P/B0H3PJ8GT8.01.LZZZZZZZ.jpg",
+    "heroBackgroundUrl": "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=2400&q=82",
+    "writingDeskUrl": "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1800&q=82",
+    "actionWorkspaceUrl": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1800&q=82",
+    "affiliateUrl": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1800&q=82"
+  },
+  "proof": {
+    "assuranceItems": [
+      "Secure Stripe checkout",
+      "No customer account required",
+      "$20.00 per book",
+      "$4.95 shipping & handling per order",
+      "Applicable tax calculated separately"
+    ],
+    "testimonials": []
+  },
+  "framework": {
+    "steps": [
+      {
+        "label": "Start",
+        "description": "Take a concrete step now instead of letting the idea cool on the shelf."
+      },
+      {
+        "label": "Sustain",
+        "description": "Build the rhythms and feedback loops that keep the right work moving."
+      },
+      {
+        "label": "Succeed",
+        "description": "Let repeated, meaningful action compound into results, opportunities, and freedom."
+      }
+    ],
+    "parts": [
+      {
+        "eyebrow": "Part I",
+        "title": "Clarity Creates Speed",
+        "question": "What should I be doing now instead of everything else?",
+        "chapters": [
+          "Define the Win",
+          "Work That Moves the Needle",
+          "The NOW Success Cycle",
+          "The Big Three for Today"
+        ]
+      },
+      {
+        "eyebrow": "Part II",
+        "title": "Start Quicker",
+        "question": "How do I get myself to start the right things today instead of later?",
+        "chapters": [
+          "Why We Don’t Start",
+          "Micro-Starts That Break the Stall",
+          "Productive Pressure",
+          "From Idea to In-Motion"
+        ]
+      },
+      {
+        "eyebrow": "Part III",
+        "title": "Sustain Better",
+        "question": "How do I keep going long enough for success to become inevitable?",
+        "chapters": [
+          "From Effort to Rhythm",
+          "Environment by Design",
+          "Feedback in Motion",
+          "Stay, Shift, or Stop"
+        ]
+      },
+      {
+        "eyebrow": "Part IV",
+        "title": "Guarding Your Execution Capacity",
+        "question": "How do I protect my ability to act quickly and well over the long haul?",
+        "chapters": [
+          "Find the Leaks",
+          "The Power of No",
+          "Calendar as Strategy",
+          "Recovery as Fuel"
+        ]
+      },
+      {
+        "eyebrow": "Part V",
+        "title": "Multiply Your Wins",
+        "question": "How do I make each success create more—and faster—success?",
+        "chapters": [
+          "Repeat the Win",
+          "Document to Scale",
+          "Leverage Engines",
+          "Living in the Loop"
+        ]
+      }
+    ]
+  },
+  "checkout": {
+    "buyButtonLabel": "Continue to secure checkout",
+    "allowedCountries": ["US"],
+    "collectPhone": false,
+    "allowPromotionCodes": false,
+    "preferDynamicCheckout": true,
+    "paymentLinkId": "plink_1Tzon3AhUpL6HYCQulSTqOVM",
+    "paymentLinkUrl": "https://book.stripe.com/6oUaEWa5i9ii9Fh8Z5cMM00"
+  },
+  "affiliate": {
+    "enabled": true,
+    "defaultCommissionPercent": 20,
+    "cookieDays": 30,
+    "applyEmail": "hello@accelanalysis.com",
+    "intro": "Share the Power NOW framework with readers, teams, and communities that value clearer decisions and quicker, better action."
+  }
+}

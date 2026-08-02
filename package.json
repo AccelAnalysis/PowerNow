@@ -1,0 +1,26 @@
+{
+  "name": "power-now-direct-sales-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Direct-sales storefront and fulfillment operations for the Power NOW book series.",
+  "scripts": {
+    "preinstall": "node bootstrap.mjs",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "check:pricing": "node scripts/check-pricing-language.mjs"
+  },
+  "dependencies": {
+    "next": "16.2.11",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "stripe": "22.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.13.10",
+    "@types/react": "19.0.10",
+    "@types/react-dom": "19.0.4",
+    "typescript": "5.8.3"
+  }
+}
