@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "@/app/globals.css";
-import { CoverPalette } from "@/components/CoverPalette";
+import "@/app/design-overrides.css";
 import { ReferralCapture } from "@/components/ReferralCapture";
 import { loadStorefrontSettings } from "@/src/lib/settings";
 
@@ -75,12 +75,12 @@ export default async function RootLayout({
           "--theme-primary": settings.theme.fallbackPrimary,
           "--theme-secondary": settings.theme.fallbackSecondary,
           "--theme-accent": settings.theme.fallbackAccent,
-          "--theme-paper": settings.theme.fallbackPaper
+          "--theme-paper": settings.theme.fallbackPaper,
+          "--theme-on-primary": "#ffffff"
         } as React.CSSProperties
       }
     >
       <body>
-        <CoverPalette settings={settings} />
         <ReferralCapture
           enabled={settings.affiliate.enabled}
           cookieDays={settings.affiliate.cookieDays}
