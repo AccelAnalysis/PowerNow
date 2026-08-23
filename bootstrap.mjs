@@ -1,8 +1,16 @@
-import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  cpSync,
+  copyFileSync,
+  existsSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync
+} from "node:fs";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 
-const sourceDirectory = path.join(process.cwd(), ".powernow");
+const root = process.cwd();
+const sourceDirectory = path.join(root, ".powernow");
 const partNames = readdirSync(sourceDirectory)
   .filter((name) => /^part\d+$/.test(name))
   .sort();
@@ -19,7 +27,7 @@ writeFileSync(archivePath, Buffer.from(encoded, "base64"));
 
 const result = spawnSync(
   "tar",
-  ["-xJf", archivePath, "-C", process.cwd()],
+  ["-xJf", archivePath, "-C", root],
   { stdio: "inherit" }
 );
 
@@ -27,4 +35,27 @@ if (result.status !== 0) {
   throw new Error("Power NOW source extraction failed.");
 }
 
-console.log("Materialized Power NOW storefront source (2d813cbca6e4).");
+function copyOverlay(sourcePath, destinationPath) {
+  const source = path.join(root, sourcePath);
+  if (!existsSync(source)) return;
+  cpSync(source, path.join(root, destinationPath), {
+    recursive: true,
+    force: true
+  });
+}
+
+copyOverlay("inspection-series/app", "app");
+copyOverlay("inspection-series/components", "components");
+copyOverlay("inspection-series/src/lib", "src/lib");
+
+const multiBookOrders = path.join(
+  root,
+  "inspection-series-operational/src/lib/orders.ts"
+);
+if (existsSync(multiBookOrders)) {
+  copyFileSync(multiBookOrders, path.join(root, "src/lib/orders.ts"));
+}
+
+console.log(
+  "Materialized Power NOW storefront source with multi-book series overlays."
+);

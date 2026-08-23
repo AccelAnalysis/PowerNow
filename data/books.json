@@ -1,0 +1,39 @@
+{
+  "series": {
+    "name": "Power NOW",
+    "title": "The Power NOW Series",
+    "description": "Quicker, better action. Quicker, better success.",
+    "featuredBookSlug": "clarity-creates-speed",
+    "homepageBookSlugs": [
+      "clarity-creates-speed"
+    ],
+    "developmentNote": "More Power NOW books are in development."
+  },
+  "books": [
+    {
+      "slug": "clarity-creates-speed",
+      "sequence": 1,
+      "status": "available",
+      "title": "Clarity Creates Speed",
+      "subtitle": "Know what actually deserves your NOW.",
+      "description": "Define the win, separate needle-moving work from noise, and decide what deserves your now.",
+      "guidingQuestion": "What should I be doing now instead of everything else?",
+      "editionLabel": "Paperback · Direct from the Author",
+      "priceCents": 2000,
+      "shippingCents": 495,
+      "currency": "usd",
+      "purchaseLimit": 10,
+      "shipsFrom": "Accel Analysis",
+      "estimatedShipWindow": "Estimated delivery: 5–10 business days after payment confirmation",
+      "taxNotice": "Plus applicable sales tax, calculated at checkout.",
+      "stripeProductId": "prod_UzoKNuyI2AYWzx",
+      "stripePriceId": "price_1TzomYAhUpL6HYCQbfVTOL3j",
+      "paymentLinkId": "plink_1TzvV6AhUpL6HYCQzoOstecc",
+      "paymentLinkUrl": "https://book.stripe.com/9B67sKb9m1PQ7x92AHcMM01",
+      "coverUrl": "/api/book-cover",
+      "amazonUrl": "https://www.amazon.com/Clarity-Creates-Speed-actually-deserves/dp/B0H3PJ8GT8/",
+      "asin": "B0H3PJ8GT8",
+      "samplePath": "/read-chapter-one"
+    }
+  ]
+}
