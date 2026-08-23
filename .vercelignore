@@ -1,0 +1,2 @@
+# Publishing source material belongs in GitHub, not in the deployed storefront build context.
+publishing/
