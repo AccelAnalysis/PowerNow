@@ -3,34 +3,30 @@ import { BookCover } from "@/components/BookCover";
 import { CheckoutButton } from "@/components/CheckoutButton";
 import { MobileBuyBar } from "@/components/MobileBuyBar";
 import { PriceBreakdown } from "@/components/PriceBreakdown";
+import { SeriesShelf } from "@/components/SeriesShelf";
+import { loadSeriesCatalog } from "@/src/lib/books";
 import { loadStorefrontSettings } from "@/src/lib/settings";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const settings = await loadStorefrontSettings();
+  const [settings, catalog] = await Promise.all([
+    loadStorefrontSettings(),
+    loadSeriesCatalog()
+  ]);
 
   return (
     <main className="storefront-page">
-      <header
-        className="site-header"
-        aria-label="Power NOW site navigation"
-      >
-        <Link
-          href="/"
-          className="brand-lockup"
-          aria-label="Power NOW home"
-        >
+      <header className="site-header" aria-label="Power NOW site navigation">
+        <Link href="/" className="brand-lockup" aria-label="Power NOW home">
           <span>{settings.brand.seriesName}</span>
           <small>{settings.brand.publisherName}</small>
         </Link>
 
-        <nav
-          className="desktop-nav"
-          aria-label="Primary navigation"
-        >
-          <Link href="/read-chapter-one">Read a sample</Link>
+        <nav className="desktop-nav" aria-label="Primary navigation">
+          <Link href="/books">Books</Link>
           <a href="#framework">Framework</a>
+          <Link href="/read-chapter-one">Read</Link>
           {settings.affiliate.enabled ? (
             <Link href="/affiliates">Affiliates</Link>
           ) : null}
@@ -40,8 +36,9 @@ export default async function HomePage() {
         <details className="mobile-nav">
           <summary>Menu</summary>
           <nav aria-label="Mobile navigation">
-            <Link href="/read-chapter-one">Read a sample</Link>
+            <Link href="/books">Books</Link>
             <a href="#framework">Framework</a>
+            <Link href="/read-chapter-one">Read</Link>
             {settings.affiliate.enabled ? (
               <Link href="/affiliates">Affiliates</Link>
             ) : null}
@@ -52,13 +49,9 @@ export default async function HomePage() {
 
       <section className="hero-section">
         <div className="hero-content">
-          <p className="eyebrow">
-            {settings.product.editionLabel}
-          </p>
+          <p className="eyebrow">{settings.product.editionLabel}</p>
           <h1>{settings.copy.heroHook}</h1>
-          <p className="hero-subhead">
-            {settings.copy.heroSubhead}
-          </p>
+          <p className="hero-subhead">{settings.copy.heroSubhead}</p>
 
           <PriceBreakdown settings={settings} />
 
@@ -67,28 +60,19 @@ export default async function HomePage() {
               settings={settings}
               label={settings.copy.primaryCta}
             />
-            <Link
-              href="/read-chapter-one"
-              className="button button-secondary"
-            >
+            <Link href="/read-chapter-one" className="button button-secondary">
               {settings.copy.secondaryCta}
             </Link>
           </div>
 
-          <div
-            className="proof-row"
-            aria-label="Purchase assurances"
-          >
+          <div className="proof-row" aria-label="Purchase assurances">
             {settings.proof.assuranceItems.map((item) => (
               <span key={item}>{item}</span>
             ))}
           </div>
         </div>
 
-        <aside
-          className="hero-book"
-          aria-label="Published book cover"
-        >
+        <aside className="hero-book" aria-label="Published book cover">
           <BookCover settings={settings} priority />
         </aside>
       </section>
@@ -96,22 +80,19 @@ export default async function HomePage() {
       <section className="section intro-section">
         <div className="section-kicker">
           <p className="eyebrow">The premise</p>
-          <h2>
-            Success gets faster when the right action gets clearer.
-          </h2>
+          <h2>Success gets faster when the right action gets clearer.</h2>
         </div>
         <div className="text-column">
           <p>
-            {settings.brand.promise} It is not a shame-based book
-            about procrastination. It is about harvesting the work
-            already within reach and putting down the distractions
-            that siphon away productive energy.
+            {settings.brand.promise} It is not a shame-based book about
+            procrastination. It is about harvesting the work already within
+            reach and putting down the distractions that siphon away productive
+            energy.
           </p>
           <p>
-            The book is for business owners, analysts, creators,
-            leaders, and builders who have more ideas than finished
-            moves—and need a cleaner way to choose what deserves
-            their now.
+            The book is for business owners, analysts, creators, leaders, and
+            builders who have more ideas than finished moves—and need a cleaner
+            way to choose what deserves their now.
           </p>
           <ul className="minimal-list">
             <li>Define the win so action has a target.</li>
@@ -122,10 +103,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section
-        className="section framework-section"
-        id="framework"
-      >
+      <SeriesShelf catalog={catalog} />
+
+      <section className="section framework-section" id="framework">
         <div className="section-heading centered">
           <p className="eyebrow">The Power NOW cycle</p>
           <h2>Start. Sustain. Succeed. Repeat.</h2>
@@ -135,9 +115,7 @@ export default async function HomePage() {
         <div className="cycle-grid">
           {settings.framework.steps.map((step, index) => (
             <article key={step.label}>
-              <span>
-                {String(index + 1).padStart(2, "0")}
-              </span>
+              <span>{String(index + 1).padStart(2, "0")}</span>
               <h3>{step.label}</h3>
               <p>{step.description}</p>
             </article>
@@ -155,9 +133,7 @@ export default async function HomePage() {
           {settings.framework.parts.map((part) => (
             <article key={part.title}>
               <div>
-                <span className="part-eyebrow">
-                  {part.eyebrow}
-                </span>
+                <span className="part-eyebrow">{part.eyebrow}</span>
                 <h3>{part.title}</h3>
                 <p>{part.question}</p>
               </div>
@@ -177,9 +153,7 @@ export default async function HomePage() {
           <h2>{settings.product.title}</h2>
           <p>{settings.product.subtitle}</p>
           <PriceBreakdown settings={settings} />
-          <p className="muted">
-            {settings.product.estimatedShipWindow}
-          </p>
+          <p className="muted">{settings.product.estimatedShipWindow}</p>
         </div>
 
         <div className="buy-card">
@@ -191,8 +165,8 @@ export default async function HomePage() {
           />
           <small>
             Stripe shows the book subtotal, the one-per-order
-            shipping-and-handling charge, and applicable tax on
-            separate lines before payment.
+            shipping-and-handling charge, and applicable tax on separate lines
+            before payment.
           </small>
         </div>
       </section>
@@ -204,10 +178,7 @@ export default async function HomePage() {
             <h2>Help your audience put better work in motion.</h2>
             <p>{settings.affiliate.intro}</p>
           </div>
-          <Link
-            href="/affiliates"
-            className="button button-secondary"
-          >
+          <Link href="/affiliates" className="button button-secondary">
             View affiliate details
           </Link>
         </section>
@@ -219,23 +190,16 @@ export default async function HomePage() {
           <span>{settings.brand.tagline}</span>
         </div>
         <nav aria-label="Footer navigation">
+          <Link href="/books">Books</Link>
           <Link href="/read-chapter-one">Read a sample</Link>
           {settings.affiliate.enabled ? (
             <Link href="/affiliates">Affiliates</Link>
           ) : null}
-          <Link href="/shipping-returns">
-            Shipping &amp; returns
-          </Link>
+          <Link href="/shipping-returns">Shipping &amp; returns</Link>
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
-          <a href={`mailto:${settings.brand.contactEmail}`}>
-            Contact
-          </a>
-          <a
-            href={settings.product.amazonUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a href={`mailto:${settings.brand.contactEmail}`}>Contact</a>
+          <a href={settings.product.amazonUrl} target="_blank" rel="noreferrer">
             Amazon listing
           </a>
         </nav>
