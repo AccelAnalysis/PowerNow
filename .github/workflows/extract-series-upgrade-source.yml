@@ -23,31 +23,20 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf /tmp/powernow-source inspection-series
-          mkdir -p /tmp/powernow-source inspection-series
+          rm -rf /tmp/powernow-source inspection-series-operational
+          mkdir -p /tmp/powernow-source inspection-series-operational/app/api/stripe/webhook inspection-series-operational/src/lib
           cat .powernow/part* | base64 --decode > /tmp/powernow-source.tar.xz
           tar -xJf /tmp/powernow-source.tar.xz -C /tmp/powernow-source
-          mkdir -p inspection-series/app/api/checkout inspection-series/app/api/admin/settings inspection-series/app/admin inspection-series/components inspection-series/src/lib
-          cp /tmp/powernow-source/app/page.tsx inspection-series/app/page.tsx
-          cp /tmp/powernow-source/app/layout.tsx inspection-series/app/layout.tsx
-          cp /tmp/powernow-source/app/globals.css inspection-series/app/globals.css
-          cp /tmp/powernow-source/app/api/checkout/route.ts inspection-series/app/api/checkout/route.ts
-          cp /tmp/powernow-source/app/api/admin/settings/route.ts inspection-series/app/api/admin/settings/route.ts
-          cp /tmp/powernow-source/app/admin/page.tsx inspection-series/app/admin/page.tsx
-          cp /tmp/powernow-source/components/AdminSettingsEditor.tsx inspection-series/components/AdminSettingsEditor.tsx
-          cp /tmp/powernow-source/components/BookCover.tsx inspection-series/components/BookCover.tsx
-          cp /tmp/powernow-source/components/CheckoutButton.tsx inspection-series/components/CheckoutButton.tsx
-          cp /tmp/powernow-source/components/MobileBuyBar.tsx inspection-series/components/MobileBuyBar.tsx
-          cp /tmp/powernow-source/components/PriceBreakdown.tsx inspection-series/components/PriceBreakdown.tsx
-          cp /tmp/powernow-source/src/lib/settings.ts inspection-series/src/lib/settings.ts
-          find /tmp/powernow-source/app -maxdepth 3 -type f | sort > inspection-series/app-files.txt
-          find /tmp/powernow-source/components -maxdepth 2 -type f | sort > inspection-series/component-files.txt
-      - name: Commit inspection source
+          cp /tmp/powernow-source/app/api/stripe/webhook/route.ts inspection-series-operational/app/api/stripe/webhook/route.ts
+          cp /tmp/powernow-source/app/sitemap.ts inspection-series-operational/app/sitemap.ts
+          find /tmp/powernow-source/src/lib -maxdepth 1 -type f | sort > inspection-series-operational/src-lib-files.txt
+          cp /tmp/powernow-source/src/lib/*.ts inspection-series-operational/src/lib/
+      - name: Commit operational inspection source
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add inspection-series
-          git commit -m "Expose source for multi-book series upgrade"
+          git add inspection-series-operational
+          git commit -m "Expose operational source for multi-book series upgrade"
           git push origin HEAD:feature/multi-book-series
