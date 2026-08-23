@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "@/app/globals.css";
 import "@/app/design-overrides.css";
+import "@/app/series.css";
 import { ReferralCapture } from "@/components/ReferralCapture";
 import { loadStorefrontSettings } from "@/src/lib/settings";
 
