@@ -1,11 +1,4 @@
 import Stripe from "stripe";
-import {
-  getBookBySlug,
-  getFeaturedBook,
-  loadSeriesCatalog,
-  type SeriesBook,
-  type SeriesCatalog
-} from "@/src/lib/books";
 import { loadStorefrontSettings } from "@/src/lib/settings";
 import { postSignedPayload } from "@/src/lib/webhook-delivery";
 
@@ -19,7 +12,7 @@ export type ShippingAddress = {
 };
 
 export type NormalizedOrder = {
-  schemaVersion: "1.1";
+  schemaVersion: "1.0";
   eventId: string;
   eventType: string;
   orderId: string;
@@ -29,7 +22,6 @@ export type NormalizedOrder = {
   paidAt: string;
   paymentStatus: string;
   currency: string;
-  bookSlug: string;
   productId: string;
   productTitle: string;
   quantity: number;
@@ -107,74 +99,17 @@ function sessionShipping(session: Stripe.Checkout.Session): {
   };
 }
 
-function productMetadata(item: Stripe.LineItem): Record<string, string> {
-  const product = item.price?.product;
-  if (product && typeof product !== "string" && "metadata" in product) {
-    return product.metadata ?? {};
-  }
-  return {};
-}
-
-function resolveBookForSession(
-  session: Stripe.Checkout.Session,
-  catalog: SeriesCatalog
-): SeriesBook {
-  const metadataSlug = session.metadata?.book_slug;
-  if (metadataSlug) {
-    const bySlug = getBookBySlug(catalog, metadataSlug);
-    if (bySlug) return bySlug;
-  }
-
-  const metadataProduct = session.metadata?.product_id;
-  if (metadataProduct) {
-    const byProduct = catalog.books.find(
-      (book) =>
-        book.slug === metadataProduct ||
-        book.stripeProductId === metadataProduct
-    );
-    if (byProduct) return byProduct;
-  }
-
-  const paymentLinkId = valueId(session.payment_link);
-  if (paymentLinkId) {
-    const byLink = catalog.books.find(
-      (book) => book.paymentLinkId === paymentLinkId
-    );
-    if (byLink) return byLink;
-  }
-
-  for (const item of session.line_items?.data ?? []) {
-    const metadata = productMetadata(item);
-    const byLineMetadata = catalog.books.find(
-      (book) =>
-        metadata.book_slug === book.slug ||
-        metadata.product_id === book.stripeProductId ||
-        metadata.product_id === book.slug
-    );
-    if (byLineMetadata) return byLineMetadata;
-
-    const description = item.description?.toLowerCase() ?? "";
-    const byTitle = catalog.books.find((book) =>
-      description.includes(book.title.toLowerCase())
-    );
-    if (byTitle) return byTitle;
-  }
-
-  return getFeaturedBook(catalog);
-}
-
-function quantityFromSession(
-  session: Stripe.Checkout.Session,
-  book: SeriesBook
-): number {
+function quantityFromSession(session: Stripe.Checkout.Session): number {
   const expanded = session.line_items?.data ?? [];
   const bookLine = expanded.find((item) => {
-    const metadata = productMetadata(item);
+    const product = item.price?.product;
+    const metadata =
+      product && typeof product !== "string" && "metadata" in product
+        ? product.metadata
+        : undefined;
     return (
-      metadata.book_slug === book.slug ||
-      metadata.product_id === book.stripeProductId ||
-      metadata.product_id === book.slug ||
-      item.description?.toLowerCase().includes(book.title.toLowerCase())
+      metadata?.product_id === "clarity-creates-speed-paperback" ||
+      item.description?.toLowerCase().includes("clarity creates speed")
     );
   });
   const lineQuantity = bookLine?.quantity;
@@ -190,19 +125,13 @@ function quantityFromSession(
 
 function unitPriceFromSession(
   session: Stripe.Checkout.Session,
-  book: SeriesBook
+  fallback: number
 ): number {
   const expanded = session.line_items?.data ?? [];
-  const bookLine = expanded.find((item) => {
-    const metadata = productMetadata(item);
-    return (
-      metadata.book_slug === book.slug ||
-      metadata.product_id === book.stripeProductId ||
-      metadata.product_id === book.slug ||
-      item.description?.toLowerCase().includes(book.title.toLowerCase())
-    );
-  });
-  return bookLine?.price?.unit_amount ?? book.priceCents;
+  const bookLine = expanded.find((item) =>
+    item.description?.toLowerCase().includes("clarity creates speed")
+  );
+  return bookLine?.price?.unit_amount ?? fallback;
 }
 
 export async function normalizeCheckoutOrder(options: {
@@ -211,12 +140,8 @@ export async function normalizeCheckoutOrder(options: {
   session: Stripe.Checkout.Session;
 }): Promise<NormalizedOrder> {
   const { eventId, eventType, session } = options;
-  const [settings, catalog] = await Promise.all([
-    loadStorefrontSettings(),
-    loadSeriesCatalog()
-  ]);
-  const book = resolveBookForSession(session, catalog);
-  const quantity = quantityFromSession(session, book);
+  const settings = await loadStorefrontSettings();
+  const quantity = quantityFromSession(session);
   const details = session.customer_details;
   const shipping = sessionShipping(session);
   const totals = session.total_details;
@@ -225,7 +150,7 @@ export async function normalizeCheckoutOrder(options: {
   ).toISOString();
 
   return {
-    schemaVersion: "1.1",
+    schemaVersion: "1.0",
     eventId,
     eventType,
     orderId: `PN-${session.id}`,
@@ -234,17 +159,18 @@ export async function normalizeCheckoutOrder(options: {
     paymentLinkId: valueId(session.payment_link),
     paidAt,
     paymentStatus: session.payment_status,
-    currency: (session.currency ?? book.currency ?? settings.product.currency).toUpperCase(),
-    bookSlug: book.slug,
-    productId:
-      session.metadata?.product_id || book.stripeProductId || book.slug,
-    productTitle: book.title,
+    currency: (session.currency ?? settings.product.currency).toUpperCase(),
+    productId: session.metadata?.product_id ?? settings.product.id,
+    productTitle: settings.product.title,
     quantity,
-    unitPriceCents: unitPriceFromSession(session, book),
-    subtotalCents: session.amount_subtotal ?? book.priceCents * quantity,
+    unitPriceCents: unitPriceFromSession(
+      session,
+      settings.product.priceCents
+    ),
+    subtotalCents: session.amount_subtotal ?? settings.product.priceCents * quantity,
     shippingCents:
       totals?.amount_shipping ??
-      Number(session.metadata?.shipping_cents ?? book.shippingCents),
+      Number(session.metadata?.shipping_cents ?? settings.product.shippingCents),
     taxCents: totals?.amount_tax ?? 0,
     discountCents: totals?.amount_discount ?? 0,
     totalCents: session.amount_total ?? 0,
@@ -315,7 +241,6 @@ export async function dispatchCheckoutSession(options: {
   let ledger: DispatchResult["ledger"] = "not_configured";
   let fulfillment: DispatchResult["fulfillment"] = "not_configured";
   const metadataUpdate: Record<string, string> = {
-    book_slug: order.bookSlug,
     fulfillment_status:
       metadata.fulfillment_status || "READY_TO_FULFILL"
   };
@@ -348,7 +273,8 @@ export async function dispatchCheckoutSession(options: {
         idempotencyKey: `fulfillment:${session.id}`
       });
       fulfillment = "sent";
-      metadataUpdate.fulfillment_dispatched_at = new Date().toISOString();
+      metadataUpdate.fulfillment_dispatched_at =
+        new Date().toISOString();
       metadataUpdate.fulfillment_status = "SUBMITTED_TO_FULFILLMENT";
     }
   }
@@ -371,8 +297,6 @@ export type AdminOrder = {
   createdAt: string;
   paymentStatus: string;
   currency: string;
-  bookSlug: string;
-  productTitle: string;
   amountSubtotal: number;
   amountShipping: number;
   amountTax: number;
@@ -395,42 +319,33 @@ export async function listPaidOrders(
   stripe: Stripe,
   limit = 100
 ): Promise<AdminOrder[]> {
-  const catalog = await loadSeriesCatalog();
+  const settings = await loadStorefrontSettings();
   const sessions = await stripe.checkout.sessions.list({
     limit: Math.min(Math.max(limit, 1), 100),
     status: "complete",
-    expand: ["data.line_items", "data.line_items.data.price.product"]
+    expand: ["data.line_items"]
   });
 
   const orders: AdminOrder[] = [];
   for (const session of sessions.data) {
-    const paymentLinkId = valueId(session.payment_link);
     const isPowerNow =
       session.metadata?.source === "powernow_direct_storefront" ||
-      catalog.books.some(
-        (book) =>
-          (paymentLinkId && book.paymentLinkId === paymentLinkId) ||
-          session.metadata?.book_slug === book.slug ||
-          session.metadata?.product_id === book.stripeProductId ||
-          session.metadata?.product_id === book.slug
-      );
+      valueId(session.payment_link) === settings.checkout.paymentLinkId ||
+      session.metadata?.product_id === settings.product.id;
 
     if (!isPowerNow || session.payment_status !== "paid") continue;
 
-    const book = resolveBookForSession(session, catalog);
     const shipping = sessionShipping(session);
     orders.push({
       id: session.id,
       createdAt: new Date(session.created * 1000).toISOString(),
       paymentStatus: session.payment_status,
       currency: (session.currency ?? "usd").toUpperCase(),
-      bookSlug: book.slug,
-      productTitle: book.title,
       amountSubtotal: session.amount_subtotal ?? 0,
       amountShipping: session.total_details?.amount_shipping ?? 0,
       amountTax: session.total_details?.amount_tax ?? 0,
       amountTotal: session.amount_total ?? 0,
-      quantity: quantityFromSession(session, book),
+      quantity: quantityFromSession(session),
       customerName: session.customer_details?.name ?? null,
       customerEmail: session.customer_details?.email ?? null,
       customerPhone: session.customer_details?.phone ?? null,
@@ -444,11 +359,14 @@ export async function listPaidOrders(
         session.metadata?.fulfillment_status ?? "READY_TO_FULFILL",
       trackingNumber: session.metadata?.tracking_number ?? null,
       carrier: session.metadata?.carrier ?? null,
-      ledgerDispatchedAt: session.metadata?.ledger_dispatched_at ?? null,
+      ledgerDispatchedAt:
+        session.metadata?.ledger_dispatched_at ?? null,
       fulfillmentDispatchedAt:
         session.metadata?.fulfillment_dispatched_at ?? null
     });
   }
 
-  return orders.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return orders.sort((a, b) =>
+    b.createdAt.localeCompare(a.createdAt)
+  );
 }
