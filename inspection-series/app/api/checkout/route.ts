@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import {
+  getBookBySlug,
+  isBookPurchasable,
+  loadSeriesCatalog,
+  type SeriesBook
+} from "@/src/lib/books";
 import { loadStorefrontSettings } from "@/src/lib/settings";
 
 export const runtime = "nodejs";
@@ -14,22 +20,14 @@ type CheckoutPayload = {
 function requestOrigin(request: Request): string {
   const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
   if (configured) return configured.replace(/\/$/, "");
-
   const forwardedHost = request.headers.get("x-forwarded-host");
-  const forwardedProtocol =
-    request.headers.get("x-forwarded-proto") ?? "https";
-  if (forwardedHost) {
-    return `${forwardedProtocol}://${forwardedHost}`;
-  }
-
+  const forwardedProtocol = request.headers.get("x-forwarded-proto") ?? "https";
+  if (forwardedHost) return `${forwardedProtocol}://${forwardedHost}`;
   const url = new URL(request.url);
   return `${url.protocol}//${url.host}`;
 }
 
-function paymentLinkUrl(
-  base: string,
-  affiliateRef: string
-): string {
+function paymentLinkUrl(base: string, affiliateRef: string): string {
   const url = new URL(base);
   if (affiliateRef) {
     url.searchParams.set("client_reference_id", affiliateRef);
@@ -39,39 +37,70 @@ function paymentLinkUrl(
   return url.toString();
 }
 
-export async function POST(request: Request) {
-  const settings = await loadStorefrontSettings();
-  const payload = (await request.json().catch(() => ({}))) as CheckoutPayload;
+function absoluteCover(book: SeriesBook, origin: string): string | undefined {
+  const value = book.coverUrl.trim();
+  if (!value) return undefined;
+  if (/^https?:\/\//i.test(value)) return value;
+  if (value.startsWith("/")) return `${origin}${value}`;
+  return undefined;
+}
 
-  if (payload.productId && payload.productId !== settings.product.id) {
+export async function POST(request: Request) {
+  const [settings, catalog] = await Promise.all([
+    loadStorefrontSettings(),
+    loadSeriesCatalog()
+  ]);
+  const payload = (await request.json().catch(() => ({}))) as CheckoutPayload;
+  const requested = String(payload.productId ?? "").trim();
+
+  let book = requested ? getBookBySlug(catalog, requested) : undefined;
+  if (!book && requested === settings.product.id) {
+    book = getBookBySlug(catalog, catalog.series.featuredBookSlug);
+  }
+  if (!book && !requested) {
+    book = getBookBySlug(catalog, catalog.series.featuredBookSlug);
+  }
+  if (!book) {
+    return NextResponse.json({ error: "Unknown book." }, { status: 400 });
+  }
+  if (!isBookPurchasable(book)) {
     return NextResponse.json(
-      { error: "Unknown product." },
-      { status: 400 }
+      { error: `${book.title} is not currently available for purchase.` },
+      { status: 409 }
     );
   }
 
   const parsedQuantity = Number(payload.quantity ?? 1);
   const quantity = Number.isFinite(parsedQuantity)
-    ? Math.min(
-        settings.product.purchaseLimit,
-        Math.max(1, Math.round(parsedQuantity))
-      )
+    ? Math.min(book.purchaseLimit, Math.max(1, Math.round(parsedQuantity)))
     : 1;
   const affiliateRef = String(payload.affiliateRef ?? "")
     .replace(/[^a-zA-Z0-9_.-]/g, "")
     .slice(0, 80);
+  const paymentLink =
+    book.paymentLinkUrl ||
+    (book.slug === catalog.series.featuredBookSlug
+      ? settings.checkout.paymentLinkUrl
+      : "");
 
   const secretKey = process.env.STRIPE_SECRET_KEY?.trim();
   if (!secretKey || !settings.checkout.preferDynamicCheckout) {
+    if (!paymentLink) {
+      return NextResponse.json(
+        {
+          error:
+            "This book is marked available but does not yet have a Stripe Payment Link."
+        },
+        { status: 503 }
+      );
+    }
     return NextResponse.json({
-      url: paymentLinkUrl(
-        settings.checkout.paymentLinkUrl,
-        affiliateRef
-      ),
+      url: paymentLinkUrl(paymentLink, affiliateRef),
       mode: "payment_link",
+      bookSlug: book.slug,
       pricing: {
-        bookPriceCents: settings.product.priceCents,
-        shippingCents: settings.product.shippingCents,
+        bookPriceCents: book.priceCents,
+        shippingCents: book.shippingCents,
         tax: "calculated_separately_when_applicable"
       }
     });
@@ -79,8 +108,8 @@ export async function POST(request: Request) {
 
   const stripe = new Stripe(secretKey);
   const origin = requestOrigin(request);
-  const automaticTax =
-    process.env.STRIPE_AUTOMATIC_TAX !== "false";
+  const automaticTax = process.env.STRIPE_AUTOMATIC_TAX !== "false";
+  const cover = absoluteCover(book, origin);
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -92,17 +121,18 @@ export async function POST(request: Request) {
         {
           quantity,
           price_data: {
-            currency: settings.product.currency,
-            unit_amount: settings.product.priceCents,
+            currency: book.currency,
+            unit_amount: book.priceCents,
             tax_behavior: "exclusive",
             product_data: {
-              name: settings.product.title,
-              description: `${settings.product.editionLabel} · ${settings.product.subtitle}`,
-              images: [`${origin}/api/book-cover`],
+              name: book.title,
+              description: `${book.editionLabel} · ${book.subtitle}`,
+              images: cover ? [cover] : undefined,
               tax_code: "txcd_35010000",
               metadata: {
-                product_id: settings.product.id,
-                asin: settings.product.asin
+                book_slug: book.slug,
+                product_id: book.stripeProductId || book.slug,
+                asin: book.asin
               }
             }
           }
@@ -117,8 +147,8 @@ export async function POST(request: Request) {
             type: "fixed_amount",
             display_name: "Shipping & handling",
             fixed_amount: {
-              amount: settings.product.shippingCents,
-              currency: settings.product.currency
+              amount: book.shippingCents,
+              currency: book.currency
             },
             tax_behavior: "exclusive",
             tax_code: "txcd_92010001",
@@ -131,11 +161,8 @@ export async function POST(request: Request) {
       ],
       automatic_tax: automaticTax ? { enabled: true } : undefined,
       billing_address_collection: "auto",
-      phone_number_collection: {
-        enabled: settings.checkout.collectPhone
-      },
-      allow_promotion_codes:
-        settings.checkout.allowPromotionCodes,
+      phone_number_collection: { enabled: settings.checkout.collectPhone },
+      allow_promotion_codes: settings.checkout.allowPromotionCodes,
       custom_text: {
         submit: {
           message:
@@ -148,17 +175,19 @@ export async function POST(request: Request) {
       },
       metadata: {
         source: "powernow_direct_storefront",
-        product_id: settings.product.id,
+        book_slug: book.slug,
+        product_id: book.stripeProductId || book.slug,
         quantity: String(quantity),
         affiliate_ref: affiliateRef,
-        unit_price_cents: String(settings.product.priceCents),
-        shipping_cents: String(settings.product.shippingCents),
+        unit_price_cents: String(book.priceCents),
+        shipping_cents: String(book.shippingCents),
         fulfillment_status: "AWAITING_PAYMENT"
       },
       payment_intent_data: {
         metadata: {
           source: "powernow_direct_storefront",
-          product_id: settings.product.id,
+          book_slug: book.slug,
+          product_id: book.stripeProductId || book.slug,
           quantity: String(quantity),
           affiliate_ref: affiliateRef
         }
@@ -174,9 +203,10 @@ export async function POST(request: Request) {
     return NextResponse.json({
       url: session.url,
       mode: "checkout_session",
+      bookSlug: book.slug,
       pricing: {
-        bookPriceCents: settings.product.priceCents,
-        shippingCents: settings.product.shippingCents,
+        bookPriceCents: book.priceCents,
+        shippingCents: book.shippingCents,
         tax: "calculated_separately_when_applicable"
       }
     });
@@ -186,18 +216,22 @@ export async function POST(request: Request) {
       error instanceof Error ? error.message : error
     );
 
-    // Keep sales available through the reviewed fixed-price Payment Link.
+    if (!paymentLink) {
+      return NextResponse.json(
+        { error: "Secure checkout is temporarily unavailable for this book." },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json({
-      url: paymentLinkUrl(
-        settings.checkout.paymentLinkUrl,
-        affiliateRef
-      ),
+      url: paymentLinkUrl(paymentLink, affiliateRef),
       mode: "payment_link_fallback",
+      bookSlug: book.slug,
       warning:
-        "Dynamic checkout was unavailable; the fixed $20 book price and $4.95 shipping-and-handling Payment Link was used.",
+        "Dynamic checkout was unavailable; the configured fixed-price Payment Link was used.",
       pricing: {
-        bookPriceCents: settings.product.priceCents,
-        shippingCents: settings.product.shippingCents,
+        bookPriceCents: book.priceCents,
+        shippingCents: book.shippingCents,
         tax: "calculated_separately_when_applicable"
       }
     });
