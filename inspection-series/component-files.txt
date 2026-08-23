@@ -1,0 +1,8 @@
+/tmp/powernow-source/components/AdminSettingsEditor.tsx
+/tmp/powernow-source/components/BookCover.tsx
+/tmp/powernow-source/components/CheckoutButton.tsx
+/tmp/powernow-source/components/CoverPalette.tsx
+/tmp/powernow-source/components/MobileBuyBar.tsx
+/tmp/powernow-source/components/OrderLedger.tsx
+/tmp/powernow-source/components/PriceBreakdown.tsx
+/tmp/powernow-source/components/ReferralCapture.tsx
